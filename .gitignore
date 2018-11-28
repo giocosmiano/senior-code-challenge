@@ -1,0 +1,9 @@
+# Build/temp directory stuff:
+/dist
+/tmp
+/build
+
+# User-specific stuff:
+.idea
+.gradle
+senior-code-challenge.iml
