@@ -63,8 +63,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /*
-     * NOTE: This function is making an assumption that employee/subordinates relationships are establish *correctly*
-     * otherwise it will return an empty list since Java doesn't have a `Bottom` type, see for details --> https://en.wikipedia.org/wiki/Bottom_type
+     * NOTE: This function is making an assumption that employee/subordinates
+     * relationships are establish *correctly* otherwise it will return an empty list
+     * since Java doesn't have a `Bottom` type, see for details --> https://en.wikipedia.org/wiki/Bottom_type
      */
     private List<Employee> collectEmployeeSubordinates(Employee employee) {
         List<Employee> subordinates = new ArrayList<>();
