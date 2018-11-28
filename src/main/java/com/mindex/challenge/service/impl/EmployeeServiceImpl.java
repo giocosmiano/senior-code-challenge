@@ -77,10 +77,14 @@ public class EmployeeServiceImpl implements EmployeeService {
                         List<Employee> listOfSubordinates = new ArrayList<>();
                         Employee subordinate = employeeRepository.findByEmployeeId(directReport.getEmployeeId());
                         if (subordinate != null) {
+
                             LOG.info("processing employee [{}]; subordinate [{}]",
                                     employee.getFirstName() + " " + employee.getLastName(),
                                     subordinate.getFirstName() + " " + subordinate.getLastName());
+
                             listOfSubordinates.add(subordinate);
+
+                            // recursively getting the reporting subordinates of the current subordinate
                             listOfSubordinates.addAll(collectEmployeeSubordinates(subordinate));
                         }
                         return listOfSubordinates;
