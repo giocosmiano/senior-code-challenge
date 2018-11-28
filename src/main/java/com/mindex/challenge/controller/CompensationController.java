@@ -22,8 +22,8 @@ public class CompensationController {
      * type: application/json
      * body:
      * {
-     *  "employee" : {
-     *      "employeeId" : "16a596ae-edd3-4847-99fe-c4518e82c86f"
+     *	"employee" : {
+     * 		"employeeId" : "16a596ae-edd3-4847-99fe-c4518e82c86f"
      *  },
      * 	"salary" : "1000",
      * 	"effectiveDate" : "2018-11-26"
