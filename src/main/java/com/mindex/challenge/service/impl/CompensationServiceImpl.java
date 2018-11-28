@@ -62,26 +62,38 @@ public class CompensationServiceImpl implements CompensationService {
     }
 
     private Compensation mapDtoToCompensation(CompensationDto compensationDto) {
-        if (compensationDto.getEmployee() == null ||
-                compensationDto.getEmployee().getEmployeeId() == null ||
-                compensationDto.getEmployee().getEmployeeId().isEmpty()) {
-            throw new RuntimeException("Invalid employee and/or employee id on compensation json object");
+        Compensation compensation = null;
+
+        // get by compensation id
+        if (compensationDto.getCompensationId() != null) {
+            compensation = compensationRepository.findByCompensationId(compensationDto.getCompensationId());
         }
 
-        Employee employee = employeeService.read(compensationDto.getEmployee().getEmployeeId());
+        // if compensation isn't found, then see if we can find it by employee id
+        if (compensation == null) {
 
-        // making sure we're creating/updating compensation for the same employee
-        Compensation compensation;
-        Compensation empCompensation = compensationRepository.findByEmployeeId(employee.getEmployeeId());
-        if (empCompensation == null) {
-            compensation = new Compensation();
-            compensation.setCompensationId(UUID.randomUUID().toString());
-            compensation.setEmployeeId(employee.getEmployeeId());
+            if (compensationDto.getEmployee() != null &&
+                    compensationDto.getEmployee().getEmployeeId() != null) {
 
-        } else {
-            compensation = empCompensation;
+                // we need to make sure we're creating a compensation for valid employee
+                Employee employee = employeeService.read(compensationDto.getEmployee().getEmployeeId());
+
+                Compensation empCompensation = compensationRepository.findByEmployeeId(employee.getEmployeeId());
+                if (empCompensation == null) {
+                    compensation = new Compensation();
+                    compensation.setCompensationId(UUID.randomUUID().toString());
+                    compensation.setEmployeeId(employee.getEmployeeId());
+
+                } else {
+                    compensation = empCompensation;
+                }
+
+            } else {
+                throw new RuntimeException("Invalid employee and/or employee id on compensation json object");
+            }
         }
 
+        // set the employee salary and effective date
         compensation.setSalary(compensationDto.getSalary());
 
         if (compensationDto.getEffectiveDate() != null) {
