@@ -35,28 +35,15 @@ public class CompensationServiceImpl implements CompensationService {
     public CompensationDto save(CompensationDto compensationDto) {
         LOG.debug("Creating compensation [{}]", compensationDto);
 
-        Compensation compensation = mapDtoToCompensation(compensationDto);
-
-        // making sure we're creating/updating compensation for the same employee
-        Compensation empCompensation = compensationRepository.findByEmployeeId(compensation.getEmployeeId());
-        if (empCompensation == null) {
-            compensation.setCompensationId(UUID.randomUUID().toString());
-            compensation = compensationRepository.insert(compensation);
-
-        } else {
-            compensation.setCompensationId(empCompensation.getCompensationId());
-            compensation = compensationRepository.save(compensation);
-        }
-
-        return mapCompensationToDto(compensation);
+        return mapCompensationToDto(compensationRepository.save(mapDtoToCompensation(compensationDto)));
     }
 
     @Override
     public List<CompensationDto> readAll() {
         LOG.debug("Getting all compensations");
 
-        List<Compensation> compensations = compensationRepository.findAll();
-        return compensations.stream()
+        return compensationRepository.findAll()
+                .stream()
                 .map(compensation -> mapCompensationToDto(compensation))
                 .collect(Collectors.toList());
     }
@@ -83,18 +70,18 @@ public class CompensationServiceImpl implements CompensationService {
 
         Employee employee = employeeService.read(compensationDto.getEmployee().getEmployeeId());
 
-        Compensation compensation = null;
-        if (compensationDto.getCompensationId() != null &&
-                ! compensationDto.getCompensationId().isEmpty()) {
-            compensation = compensationRepository.findByCompensationId(compensationDto.getCompensationId());
-        }
-
-        if (compensation == null) {
+        // making sure we're creating/updating compensation for the same employee
+        Compensation compensation;
+        Compensation empCompensation = compensationRepository.findByEmployeeId(employee.getEmployeeId());
+        if (empCompensation == null) {
             compensation = new Compensation();
+            compensation.setCompensationId(UUID.randomUUID().toString());
+            compensation.setEmployeeId(employee.getEmployeeId());
+
+        } else {
+            compensation = empCompensation;
         }
 
-        compensation.setEmployeeId(employee.getEmployeeId());
-        compensation.setCompensationId(compensationDto.getCompensationId());
         compensation.setSalary(compensationDto.getSalary());
 
         if (compensationDto.getEffectiveDate() != null) {
